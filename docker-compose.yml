@@ -1,0 +1,156 @@
+version: "3"
+
+services:
+  php5.6:
+    restart: always
+    container_name: php5.6
+    build: ./php5.6
+    ports:
+      - 9000
+    env_file:
+      - ./.env
+    volumes:
+      - ${DOCKER_PROJECT_DIR}:/var/www
+      - ./php5.6/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+  php7.0:
+    restart: always
+    container_name: php7.0
+    build: ./php7.0
+    ports:
+      - 9000
+    env_file:
+      - ./.env
+    volumes:
+      - ${DOCKER_PROJECT_DIR}:/var/www
+      - ./php7.0/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+  php7.1:
+    restart: always
+    container_name: php7.1
+    build: ./php7.1
+    ports:
+      - 9000
+    env_file:
+      - ./.env
+    volumes:
+      - ${DOCKER_PROJECT_DIR}:/var/www
+      - ./php7.1/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+  php7.2:
+    restart: always
+    container_name: php7.2
+    build: ./php7.2
+    ports:
+      - 9000
+    env_file:
+      - ./.env
+    volumes:
+      - ${DOCKER_PROJECT_DIR}:/var/www
+      - ./php7.2/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+  php7.3:
+    restart: always
+    container_name: php7.3
+    build: ./php7.3
+    ports:
+      - 9000
+    env_file:
+      - ./.env
+    volumes:
+      - ${DOCKER_PROJECT_DIR}:/var/www
+      - ./php7.3/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+  nginx:
+    restart: always
+    container_name: nginx
+    build: ./nginx
+    ports:
+      - ${DOCKER_NGINX_PORT}:80
+    env_file:
+      - ./.env
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ${DOCKER_PROJECT_DIR}:/var/www
+  mysql:
+    restart: always
+    container_name: mysql
+    build: ./mysql
+    ports:
+      - ${DOCKER_MYSQL_PORT}:3306
+    env_file:
+      - ./.env
+    environment:
+      - TZ=${TZ}
+      - MYSQL_USER=${DOCKER_MYSQL_USER}
+      - MYSQL_ROOT_PASSWORD=${DOCKER_MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ${DOCKER_MYSQL_DATA}:/var/lib/mysql
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci",
+      "--default_authentication_plugin=mysql_native_password"
+    ]
+  redis:
+    restart: always
+    container_name: redis
+    build: ./redis
+    volumes:
+      - ${DOCKER_REDIS_DATA}:/data
+    ports:
+      - ${DOCKER_REDIS_PORT}:6379
+  memcache:
+    restart: always
+    container_name: memcache
+    build: ./memcache
+    volumes:
+      - ${DOCKER_MEMCACHE_DATA}:/var/lib/memcached
+    ports:
+      - ${DOCKER_MEMCACHE_PORT}:11211
+  mongo:
+    restart: always
+    container_name: mongo
+    build: ./mongo
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - ${DOCKER_MONGO_PORT}:27017
+  rabbitmq:
+    restart: always
+    container_name: rabbitmq
+    build: ./rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${DOCKER_RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${DOCKER_RABBITMQ_DEFAULT_PASS}
+    ports:
+      - ${DOCKER_RABBITMQ_HOST_PORT}:5672
+      - ${DOCKER_RABBITMQ_HTTP_PORT}:15672
+      - ${DOCKER_RABBITMQ_HTTPS_PORT}:15671
+    volumes:
+      - ${DOCKER_RABBITMQ_DATA}:/var/lib/rabbitmq/mnesia
+  elasticsearch:
+    restart: always
+    container_name: elasticsearch
+    build: ./elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - ${DOCKER_ELASTICSEARCH_HOST_HTTP_PORT}:9200
+      - ${DOCKER_ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300
+    volumes:
+      - ${DOCKER_ELASTICSEARCH_DATA}:/usr/share/elasticsearch/data
+  kibana:
+    restart: always
+    container_name: kibana
+    build: ./kibana
+    ports:
+      - ${DOCKER_KIBANA_PORT}:5601
+    depends_on:
+      - elasticsearch
+volumes:
+  mongo_data:
+
+
+
