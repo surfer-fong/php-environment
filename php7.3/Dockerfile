@@ -12,6 +12,12 @@ RUN set -xe \
     && apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev \
     && docker-php-ext-install gd
 
+# 安装 Zip
+RUN set -xe \
+    && apk add --no-cache zip libzip-dev \
+    && docker-php-ext-configure zip --with-libzip=/usr/include \
+    && docker-php-ext-install zip
+
 # 安装 Redis
 RUN set -xe \
     && pecl install https://pecl.php.net/get/redis-5.0.2.tgz \
@@ -51,3 +57,4 @@ RUN rm -rf /usr/local/src/* \
     && rm -rf /tmp/pear/cache/*
 
 EXPOSE 9000
+EXPOSE 8888
