@@ -58,3 +58,5 @@ RUN rm -rf /usr/local/src/* \
 
 EXPOSE 9000
 EXPOSE 8888
+EXPOSE 9501
+EXPOSE 9502
