@@ -45,6 +45,9 @@ RUN set -xe \
     && pecl install http://pecl.php.net/get/swoole-4.4.5.tgz \
     && docker-php-ext-enable swoole
 
+RUN set -xe \
+    && apk --no-cache add git
+
 # 安装 Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \

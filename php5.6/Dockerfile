@@ -12,6 +12,13 @@ RUN set -xe \
     && apk add --no-cache freetype libpng libjpeg-turbo freetype-dev libpng-dev libjpeg-turbo-dev \
     && docker-php-ext-install gd
 
+# 安装 Zip
+RUN set -xe \
+    && apk add --no-cache zip libzip-dev \
+    && docker-php-ext-configure zip --with-libzip=/usr/include \
+    && docker-php-ext-install zip
+
+
 # 安装 Redis
 RUN set -xe \
     && pecl install https://pecl.php.net/get/redis-2.2.8.tgz \
@@ -26,6 +33,11 @@ RUN set -xe \
 RUN set -xe \
     && pecl install mongodb \
     && docker-php-ext-enable mongodb
+
+# 安装 Mongo
+RUN set -xe \
+    && pecl install https://pecl.php.net/get/mongo-1.6.0.tgz \
+    && docker-php-ext-enable mongo
 
 # 安装 Amqp
 RUN set -xe \
@@ -43,6 +55,10 @@ RUN set -xe \
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && unlink composer-setup.php
+
+# 安装 Python 和 graphviz
+RUN set -xe \
+    && apk --no-cache add python3 graphviz
 
 # 清理
 RUN rm -rf /usr/local/src/* \
