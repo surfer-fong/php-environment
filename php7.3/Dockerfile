@@ -48,11 +48,27 @@ RUN set -xe \
 RUN set -xe \
     && apk --no-cache add git
 
+# 安装 xhprof
+RUN set -xe \
+	&& curl -L -o /tmp/xhprof.tar.gz "https://github.com/tideways/php-xhprof-extension/archive/v4.1.7.tar.gz" \
+	&& mkdir -p xhprof \
+	&& tar -C xhprof -zxvf /tmp/xhprof.tar.gz --strip 1 \
+	&& ( \
+		cd xhprof \
+		&& phpize \
+		&& ./configure \
+		&& make \
+		&& make install \
+	) \
+	&& rm -rf xhprof \
+	&& rm /tmp/xhprof.tar.gz
+
 # 安装 Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php \
     && unlink composer-setup.php \
-    && mv composer.phar /usr/local/bin/composer
+    && mv composer.phar /usr/local/bin/composer \
+    && /usr/local/bin/composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 # 清理
 RUN rm -rf /usr/local/src/* \

@@ -14,9 +14,6 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php5.6/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_PHP_56}
   php7.0:
     restart: always
     container_name: php7.0
@@ -28,9 +25,6 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.0/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_PHP_70}
   php7.1:
     restart: always
     container_name: php7.1
@@ -42,9 +36,6 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.1/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_PHP_71}
   php7.2:
     restart: always
     container_name: php7.2
@@ -56,9 +47,6 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.2/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_PHP_72}
   php7.3:
     restart: always
     container_name: php7.3
@@ -74,9 +62,6 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.3/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
       - ./php7.3/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_PHP_73}
   nginx:
     restart: always
     container_name: nginx
@@ -97,9 +82,6 @@ services:
       - php7.2
       - php7.3
       - mysql
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_NGINX}
   mysql:
     restart: always
     container_name: mysql
@@ -121,9 +103,6 @@ services:
       "--collation-server=utf8mb4_unicode_ci",
       "--default_authentication_plugin=mysql_native_password"
     ]
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_MYSQL}
   redis:
     restart: always
     container_name: redis
@@ -134,9 +113,6 @@ services:
       - ${DOCKER_REDIS_DATA}:/data
     ports:
       - ${DOCKER_REDIS_PORT}:6379
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_REDIS}
   memcache:
     restart: always
     container_name: memcache
@@ -147,9 +123,6 @@ services:
       - ${DOCKER_MEMCACHE_DATA}:/var/lib/memcached
     ports:
       - ${DOCKER_MEMCACHE_PORT}:11211
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_MEMCACHE}
   mongo:
     restart: always
     container_name: mongo
@@ -160,9 +133,6 @@ services:
       - mongo_data:/data/db
     ports:
       - ${DOCKER_MONGO_PORT}:27017
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_MONGO}
   rabbitmq:
     restart: always
     container_name: rabbitmq
@@ -178,9 +148,6 @@ services:
       - ${DOCKER_RABBITMQ_HTTPS_PORT}:15671
     volumes:
       - ${DOCKER_RABBITMQ_DATA}:/var/lib/rabbitmq/mnesia
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_RABBITMQ}
   elasticsearch:
     restart: always
     container_name: elasticsearch
@@ -203,9 +170,6 @@ services:
       - ${DOCKER_ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300
     volumes:
       - ${DOCKER_ELASTICSEARCH_DATA}:/usr/share/elasticsearch/data
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_ELASTICSEARCH}
   kibana:
     restart: always
     container_name: kibana
@@ -216,9 +180,6 @@ services:
       - ${DOCKER_KIBANA_PORT}:5601
     depends_on:
       - elasticsearch
-    networks:
-      web:
-        ipv4_address: ${DOCKER_IP_KIBANA}
   jaeger:
     restart: always
     container_name: jaeger
@@ -233,11 +194,4 @@ services:
       - 16686:16686
 volumes:
   mongo_data:
-networks:
-  web:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: ${DOCKER_WEB_SUBNET}
-
 
