@@ -51,6 +51,11 @@ RUN set -xe \
     && pecl install http://pecl.php.net/get/swoole-2.0.11.tgz \
     && docker-php-ext-enable swoole
 
+# 安装 xhprof
+RUN set -xe \
+    && pecl install xhprof-0.9.4 \
+    && docker-php-ext-enable xhprof
+
 # 安装 Composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
