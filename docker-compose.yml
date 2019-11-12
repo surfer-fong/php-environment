@@ -173,7 +173,7 @@ services:
       - ${DOCKER_ELASTICSEARCH_DATA}:/usr/share/elasticsearch/data
       - ${DOCKER_ELASTICSEARCH_CONFIG}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/IKAnalyzer.cfg.xml:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml
-      - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/custom/extra_main.dic:/usr/share/elasticsearch/config/analysis-ik/custom/extra_main.dic
+      - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/custom:/usr/share/elasticsearch/config/analysis-ik/custom
   kibana:
     restart: always
     container_name: kibana
