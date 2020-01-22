@@ -5,6 +5,7 @@ services:
     restart: always
     container_name: php5.6
     build: ./php5.6
+    privileged: true
     ports:
       - 9000
     environment:
@@ -14,6 +15,9 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php5.6/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      web:
+        ipv4_address: ${DOCKER_PHP56_IP}
   php7.0:
     restart: always
     container_name: php7.0
@@ -25,6 +29,9 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.0/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      web:
+        ipv4_address: ${DOCKER_PHP70_IP}
   php7.1:
     restart: always
     container_name: php7.1
@@ -36,6 +43,9 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.1/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      web:
+        ipv4_address: ${DOCKER_PHP71_IP}
   php7.2:
     restart: always
     container_name: php7.2
@@ -47,6 +57,9 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.2/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      web:
+        ipv4_address: ${DOCKER_PHP72_IP}
   php7.3:
     restart: always
     container_name: php7.3
@@ -62,6 +75,9 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.3/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
       - ./php7.3/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    networks:
+      web:
+        ipv4_address: ${DOCKER_PHP73_IP}
   nginx:
     restart: always
     container_name: nginx
@@ -82,6 +98,9 @@ services:
       - php7.2
       - php7.3
       - mysql
+    networks:
+      web:
+        ipv4_address: ${DOCKER_NGINX_IP}
   mysql:
     restart: always
     container_name: mysql
@@ -103,6 +122,9 @@ services:
       "--collation-server=utf8mb4_unicode_ci",
       "--default_authentication_plugin=mysql_native_password"
     ]
+    networks:
+      web:
+        ipv4_address: ${DOCKER_MYSQL_IP}
   redis:
     restart: always
     container_name: redis
@@ -113,6 +135,9 @@ services:
       - ${DOCKER_REDIS_DATA}:/data
     ports:
       - ${DOCKER_REDIS_PORT}:6379
+    networks:
+      web:
+        ipv4_address: ${DOCKER_REDIS_IP}
   memcache:
     restart: always
     container_name: memcache
@@ -123,6 +148,9 @@ services:
       - ${DOCKER_MEMCACHE_DATA}:/var/lib/memcached
     ports:
       - ${DOCKER_MEMCACHE_PORT}:11211
+    networks:
+      web:
+        ipv4_address: ${DOCKER_MEMCACHE_IP}
   mongo:
     restart: always
     container_name: mongo
@@ -133,10 +161,13 @@ services:
       - mongo_data:/data/db
     ports:
       - ${DOCKER_MONGO_PORT}:27017
+    networks:
+      web:
+        ipv4_address: ${DOCKER_MONGO_IP}
   rabbitmq:
     restart: always
     container_name: rabbitmq
-    build: ./rabbitmq
+    build: ./rabbitmq3.5
     env_file:
       - ./.env
     environment:
@@ -148,6 +179,9 @@ services:
       - ${DOCKER_RABBITMQ_HTTPS_PORT}:15671
     volumes:
       - ${DOCKER_RABBITMQ_DATA}:/var/lib/rabbitmq/mnesia
+    networks:
+      web:
+        ipv4_address: ${DOCKER_RABBITMQ_IP}
   elasticsearch:
     restart: always
     container_name: elasticsearch
@@ -174,6 +208,9 @@ services:
       - ${DOCKER_ELASTICSEARCH_CONFIG}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
       - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/IKAnalyzer.cfg.xml:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml
       - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/custom/extra_main.dic:/usr/share/elasticsearch/config/analysis-ik/custom/extra_main.dic
+    networks:
+      web:
+        ipv4_address: ${DOCKER_ELASTICSEARCH_IP}
   kibana:
     restart: always
     container_name: kibana
@@ -184,6 +221,9 @@ services:
       - ${DOCKER_KIBANA_PORT}:5601
     depends_on:
       - elasticsearch
+    networks:
+      web:
+        ipv4_address: ${DOCKER_KIBANA_IP}
   jaeger:
     restart: always
     container_name: jaeger
@@ -196,6 +236,15 @@ services:
       - 6831:6831/udp
       - 6832:6832/udp
       - 16686:16686
+    networks:
+      web:
+        ipv4_address: ${DOCKER_JAEGER_IP}
 volumes:
   mongo_data:
+networks:
+  web:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${DOCKER_WEB_SUBNET}
 
