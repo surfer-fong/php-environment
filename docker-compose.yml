@@ -14,6 +14,8 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php5.6/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - es_net
   php7.0:
     restart: always
     container_name: php7.0
@@ -25,6 +27,8 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.0/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - es_net
   php7.1:
     restart: always
     container_name: php7.1
@@ -36,6 +40,8 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.1/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - es_net
   php7.2:
     restart: always
     container_name: php7.2
@@ -47,6 +53,8 @@ services:
     volumes:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.2/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      - es_net
   php7.3:
     restart: always
     container_name: php7.3
@@ -62,6 +70,8 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.3/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
       - ./php7.3/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+    networks:
+      - es_net
   nginx:
     restart: always
     container_name: nginx
@@ -82,6 +92,8 @@ services:
       - php7.2
       - php7.3
       - mysql
+    networks:
+      - es_net
   mysql:
     restart: always
     container_name: mysql
@@ -103,6 +115,8 @@ services:
       "--collation-server=utf8mb4_unicode_ci",
       "--default_authentication_plugin=mysql_native_password"
     ]
+    networks:
+        - es_net
   redis:
     restart: always
     container_name: redis
@@ -113,6 +127,8 @@ services:
       - ${DOCKER_REDIS_DATA}:/data
     ports:
       - ${DOCKER_REDIS_PORT}:6379
+    networks:
+      - es_net
   memcache:
     restart: always
     container_name: memcache
@@ -123,6 +139,8 @@ services:
       - ${DOCKER_MEMCACHE_DATA}:/var/lib/memcached
     ports:
       - ${DOCKER_MEMCACHE_PORT}:11211
+    networks:
+      - es_net
   mongo:
     restart: always
     container_name: mongo
@@ -133,6 +151,8 @@ services:
       - mongo_data:/data/db
     ports:
       - ${DOCKER_MONGO_PORT}:27017
+    networks:
+      - es_net
   rabbitmq:
     restart: always
     container_name: rabbitmq
@@ -148,32 +168,64 @@ services:
       - ${DOCKER_RABBITMQ_HTTPS_PORT}:15671
     volumes:
       - ${DOCKER_RABBITMQ_DATA}:/var/lib/rabbitmq/mnesia
-  elasticsearch:
+    networks:
+      - es_net
+  es_master:
     restart: always
-    container_name: elasticsearch
+    container_name: es_master
+    privileged: true
     build: ./elasticsearch
     env_file:
       - ./.env
     environment:
       - TZ=${TZ}
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
         soft: -1
         hard: -1
-      nofile:
-        soft: 65536
-        hard: 65536
-    ports:
-      - ${DOCKER_ELASTICSEARCH_HOST_HTTP_PORT}:9200
-      - ${DOCKER_ELASTICSEARCH_HOST_TRANSPORT_PORT}:9300
     volumes:
-      - ${DOCKER_ELASTICSEARCH_DATA}:/usr/share/elasticsearch/data
-      - ${DOCKER_ELASTICSEARCH_CONFIG}/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/IKAnalyzer.cfg.xml:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml
-      - ${DOCKER_ELASTICSEARCH_CONFIG}/analysis-ik/custom:/usr/share/elasticsearch/config/analysis-ik/custom
+      - ${DOCKER_ES_MASTER_DATA}:/usr/share/elasticsearch/data
+      - ${DOCKER_ES_MASTER_CONFIG}:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ${DOCKER_ES_MASTER_LOG}:/usr/share/elasticsearch/logs
+      - ${DOCKER_ES_MASTER_IK_CONFIG}:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml
+      - ${DOCKER_ES_MASTER_IK_DIC}:/usr/share/elasticsearch/config/analysis-ik/custom/my.dic
+    ports:
+      - ${DOCKER_ES_MASTER_HOST_HTTP_PORT}:9200
+    networks:
+      - es_net
+  es_slave:
+    restart: always
+    container_name: es_slave
+    privileged: true
+    build: ./elasticsearch
+    env_file:
+      - ./.env
+    environment:
+      - TZ=${TZ}
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ${DOCKER_ES_SLAVE_DATA}:/usr/share/elasticsearch/data
+      - ${DOCKER_ES_SLAVE_CONFIG}:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ${DOCKER_ES_SLAVE_LOG}:/usr/share/elasticsearch/logs
+    ports:
+      - ${DOCKER_ES_SLAVE_HOST_HTTP_PORT}:9200
+    links:
+      - es_master
+    networks:
+      - es_net
+  es_head:
+    restart: always
+    container_name: es_head
+    build: ./es_head
+    env_file:
+      - ./.env
+    ports:
+      - ${DOCKER_ES_HEAD_PORT}:9100
   kibana:
     restart: always
     container_name: kibana
@@ -183,7 +235,13 @@ services:
     ports:
       - ${DOCKER_KIBANA_PORT}:5601
     depends_on:
-      - elasticsearch
+      - es_master
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_URL=http://es_master:9200
+      - XPACK_MONITORING_ENABLED=true
+    networks:
+      - es_net
   jaeger:
     restart: always
     container_name: jaeger
@@ -196,6 +254,11 @@ services:
       - 6831:6831/udp
       - 6832:6832/udp
       - 16686:16686
+    networks:
+      - es_net
 volumes:
   mongo_data:
+networks:
+  es_net:
+    driver: bridge
 

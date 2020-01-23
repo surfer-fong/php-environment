@@ -13,4 +13,3 @@ RUN set -xe \
     && rm -rf /tmp/elasticsearch-analysis-ik.zip
 
 EXPOSE 9200
-EXPOSE 9300

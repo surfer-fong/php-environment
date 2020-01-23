@@ -1,0 +1,27 @@
+# 集群名称
+cluster.name: docker_es_cluster
+# 节点名称
+node.name: slave
+# 是否为主节点
+node.master: false
+# 是否存储数据
+node.data: true
+# 对外开放的 http 端口
+http.port: 9200
+
+# 回环地址
+network.host: 0.0.0.0
+
+discovery.zen.ping.unicast.hosts: ["es_master"]
+
+bootstrap.memory_lock: true
+
+# 是否运行跨域 REST 请求
+http.cors.enabled: true
+# 允许跨域请求来自何处
+http.cors.allow-origin: "*"
+
+# 有成为主节点资格的最小节点数
+discovery.zen.minimum_master_nodes: 1
+
+xpack.security.enabled: false
