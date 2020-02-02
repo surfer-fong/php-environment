@@ -5,6 +5,7 @@ services:
     restart: always
     container_name: php5.6
     build: ./php5.6
+    privileged: true
     ports:
       - 9000
     environment:
@@ -15,7 +16,8 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php5.6/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_PHP56_IP}
   php7.0:
     restart: always
     container_name: php7.0
@@ -28,7 +30,8 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.0/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_PHP70_IP}
   php7.1:
     restart: always
     container_name: php7.1
@@ -41,7 +44,8 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.1/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_PHP71_IP}
   php7.2:
     restart: always
     container_name: php7.2
@@ -54,7 +58,8 @@ services:
       - ${DOCKER_PROJECT_DIR}:/var/www
       - ./php7.2/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_PHP72_IP}
   php7.3:
     restart: always
     container_name: php7.3
@@ -71,7 +76,8 @@ services:
       - ./php7.3/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
       - ./php7.3/conf.d/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_PHP73_IP}
   nginx:
     restart: always
     container_name: nginx
@@ -93,7 +99,8 @@ services:
       - php7.3
       - mysql
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_NGINX_IP}
   mysql:
     restart: always
     container_name: mysql
@@ -116,7 +123,8 @@ services:
       "--default_authentication_plugin=mysql_native_password"
     ]
     networks:
-        - es_net
+      es_net:
+        ipv4_address: ${DOCKER_MYSQL_IP}
   redis:
     restart: always
     container_name: redis
@@ -128,19 +136,8 @@ services:
     ports:
       - ${DOCKER_REDIS_PORT}:6379
     networks:
-      - es_net
-  memcache:
-    restart: always
-    container_name: memcache
-    build: ./memcache
-    env_file:
-      - ./.env
-    volumes:
-      - ${DOCKER_MEMCACHE_DATA}:/var/lib/memcached
-    ports:
-      - ${DOCKER_MEMCACHE_PORT}:11211
-    networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_REDIS_IP}
   mongo:
     restart: always
     container_name: mongo
@@ -152,11 +149,12 @@ services:
     ports:
       - ${DOCKER_MONGO_PORT}:27017
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_MONGO_IP}
   rabbitmq:
     restart: always
     container_name: rabbitmq
-    build: ./rabbitmq
+    build: ./rabbitmq3.5
     env_file:
       - ./.env
     environment:
@@ -169,7 +167,8 @@ services:
     volumes:
       - ${DOCKER_RABBITMQ_DATA}:/var/lib/rabbitmq/mnesia
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_RABBITMQ_IP}
   es_master:
     restart: always
     container_name: es_master
@@ -193,7 +192,8 @@ services:
     ports:
       - ${DOCKER_ES_MASTER_HOST_HTTP_PORT}:9200
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_ES_MASTER_IP}
   es_slave:
     restart: always
     container_name: es_slave
@@ -217,7 +217,8 @@ services:
     links:
       - es_master
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_ES_SLAVE_IP}
   es_head:
     restart: always
     container_name: es_head
@@ -226,6 +227,9 @@ services:
       - ./.env
     ports:
       - ${DOCKER_ES_HEAD_PORT}:9100
+    networks:
+      es_net:
+        ipv4_address: ${DOCKER_ES_HEAD_IP}
   kibana:
     restart: always
     container_name: kibana
@@ -241,7 +245,8 @@ services:
       - ELASTICSEARCH_URL=http://es_master:9200
       - XPACK_MONITORING_ENABLED=true
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_KIBANA_IP}
   jaeger:
     restart: always
     container_name: jaeger
@@ -255,10 +260,14 @@ services:
       - 6832:6832/udp
       - 16686:16686
     networks:
-      - es_net
+      es_net:
+        ipv4_address: ${DOCKER_JAEGER_IP}
 volumes:
   mongo_data:
 networks:
   es_net:
-    driver: bridge
+    ipam:
+      config:
+        - subnet: ${DOCKER_WEB_SUBNET}
+          
 
