@@ -1,4 +1,4 @@
-FROM mongo:4.2.0
+FROM mongo
 
 LABEL maintainer="吴泽丰 <13416335317@163.com>"
 

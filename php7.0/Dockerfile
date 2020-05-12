@@ -19,7 +19,7 @@ RUN set -xe \
 
 # 安装 Xdebug
 RUN set -xe \
-    && pecl install xdebug \
+    && pecl install https://pecl.php.net/get/xdebug-2.8.0.tgz \
     && docker-php-ext-enable xdebug
 
 # 安装 Mongodb
