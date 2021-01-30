@@ -66,7 +66,7 @@ services:
     build: ./php7.3
     ports:
       - 8888:8888
-      - 9000:9000
+      - 9000
       - 9501:9501
       - 9502:9502
     env_file:
@@ -78,6 +78,20 @@ services:
     networks:
       es_net:
         ipv4_address: ${DOCKER_PHP73_IP}
+  php7.4:
+    restart: always
+    container_name: php7.4
+    build: ./php7.4
+    ports:
+      - 9000
+    env_file:
+      - ./.env
+    volumes:
+      - ${DOCKER_PROJECT_DIR}:/var/www
+      - ./php7.4/conf.d/php.ini:/usr/local/etc/php/conf.d/php.ini
+    networks:
+      es_net:
+        ipv4_address: ${DOCKER_PHP74_IP}
   nginx:
     restart: always
     container_name: nginx
@@ -169,84 +183,6 @@ services:
     networks:
       es_net:
         ipv4_address: ${DOCKER_RABBITMQ_IP}
-  es_master:
-    restart: always
-    container_name: es_master
-    privileged: true
-    build: ./elasticsearch
-    env_file:
-      - ./.env
-    environment:
-      - TZ=${TZ}
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - ${DOCKER_ES_MASTER_DATA}:/usr/share/elasticsearch/data
-      - ${DOCKER_ES_MASTER_CONFIG}:/usr/share/elasticsearch/config/elasticsearch.yml
-      - ${DOCKER_ES_MASTER_LOG}:/usr/share/elasticsearch/logs
-      - ${DOCKER_ES_MASTER_IK_CONFIG}:/usr/share/elasticsearch/config/analysis-ik/IKAnalyzer.cfg.xml
-      - ${DOCKER_ES_MASTER_IK_DIC}:/usr/share/elasticsearch/config/analysis-ik/custom/my.dic
-    ports:
-      - ${DOCKER_ES_MASTER_HOST_HTTP_PORT}:9200
-    networks:
-      es_net:
-        ipv4_address: ${DOCKER_ES_MASTER_IP}
-  es_slave:
-    restart: always
-    container_name: es_slave
-    privileged: true
-    build: ./elasticsearch
-    env_file:
-      - ./.env
-    environment:
-      - TZ=${TZ}
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - ${DOCKER_ES_SLAVE_DATA}:/usr/share/elasticsearch/data
-      - ${DOCKER_ES_SLAVE_CONFIG}:/usr/share/elasticsearch/config/elasticsearch.yml
-      - ${DOCKER_ES_SLAVE_LOG}:/usr/share/elasticsearch/logs
-    ports:
-      - ${DOCKER_ES_SLAVE_HOST_HTTP_PORT}:9200
-    links:
-      - es_master
-    networks:
-      es_net:
-        ipv4_address: ${DOCKER_ES_SLAVE_IP}
-  es_head:
-    restart: always
-    container_name: es_head
-    build: ./es_head
-    env_file:
-      - ./.env
-    ports:
-      - ${DOCKER_ES_HEAD_PORT}:9100
-    networks:
-      es_net:
-        ipv4_address: ${DOCKER_ES_HEAD_IP}
-  kibana:
-    restart: always
-    container_name: kibana
-    build: ./kibana
-    env_file:
-      - ./.env
-    ports:
-      - ${DOCKER_KIBANA_PORT}:5601
-    depends_on:
-      - es_master
-    environment:
-      - SERVER_NAME=kibana
-      - ELASTICSEARCH_URL=http://es_master:9200
-      - XPACK_MONITORING_ENABLED=true
-    networks:
-      es_net:
-        ipv4_address: ${DOCKER_KIBANA_IP}
   jaeger:
     restart: always
     container_name: jaeger

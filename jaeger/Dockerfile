@@ -1,6 +1,6 @@
 FROM jaegertracing/all-in-one
 
-LABEL maintainer="吴泽丰<13416335317@163.com>"
+LABEL maintainer="<13416335317@163.com>"
 
 EXPOSE 5775
 EXPOSE 5778

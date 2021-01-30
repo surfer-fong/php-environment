@@ -1,6 +1,6 @@
 FROM php:7.3-fpm-alpine
 
-LABEL maintainer="吴泽丰<13416335317@163.com>"
+LABEL maintainer="<13416335317@163.com>"
 
 # 安装基本扩展
 RUN set -xe \
@@ -46,6 +46,7 @@ RUN set -xe \
     && docker-php-ext-enable swoole
 
 RUN set -xe \
+    && apk update && apk upgrade \
     && apk --no-cache add git
 
 # 安装 xhprof

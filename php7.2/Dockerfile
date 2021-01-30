@@ -1,6 +1,6 @@
 FROM php:7.2-fpm-alpine
 
-LABEL maintainer="吴泽丰<13416335317@163.com>"
+LABEL maintainer="<13416335317@163.com>"
 
 # 安装基本扩展
 RUN set -xe \

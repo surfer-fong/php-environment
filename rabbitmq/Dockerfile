@@ -1,6 +1,6 @@
 FROM rabbitmq
 
-LABEL maintainer="吴泽丰 <13416335317@163.com>"
+LABEL maintainer="<13416335317@163.com>"
 
 RUN rabbitmq-plugins enable --offline rabbitmq_management
 

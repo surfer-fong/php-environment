@@ -1,6 +1,6 @@
 FROM php:7.1-fpm-alpine
 
-LABEL maintainer="吴泽丰<13416335317@163.com>"
+LABEL maintainer="<13416335317@163.com>"
 
 # 安装基本扩展
 RUN set -xe \
@@ -19,12 +19,12 @@ RUN set -xe \
 
 # 安装 Xdebug
 RUN set -xe \
-    && pecl install xdebug \
+    && pecl install http://pecl.php.net/get/xdebug-2.9.7.tgz \
     && docker-php-ext-enable xdebug
 
 # 安装 Mongodb
 RUN set -xe \
-    && pecl install mongodb \
+    && pecl install http://pecl.php.net/get/mongodb-1.7.5.tgz \
     && docker-php-ext-enable mongodb
 
 # 安装 Amqp

@@ -1,6 +1,6 @@
 FROM php:5.6-fpm-alpine
 
-LABEL maintainer="吴泽丰<13416335317@163.com>"
+LABEL maintainer="<13416335317@163.com>"
 
 # 安装基本扩展
 RUN set -xe \
@@ -31,7 +31,7 @@ RUN set -xe \
 
 # 安装 Mongo
 RUN set -xe \
-    && pecl install mongodb \
+    && pecl install http://pecl.php.net/get/mongodb-1.7.5.tgz \
     && docker-php-ext-enable mongodb
 
 # 安装 Mongo
